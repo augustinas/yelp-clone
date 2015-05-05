@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'shoulda'
+
 gem 'haml'
 
 gem 'thin'
