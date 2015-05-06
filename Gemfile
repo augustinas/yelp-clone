@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'omniauth-github'
+
 gem 'omniauth-facebook'
 
 gem 'devise'
