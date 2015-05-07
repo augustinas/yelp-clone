@@ -120,14 +120,31 @@ feature 'restaurants' do
   end
 
   context 'deleting restaurants' do
-    before { Restaurant.create name: 'KFC' }
-
     scenario 'let a user delete a restaurant' do
-      sign_up('test@test.com', 'testpassword')
+      sign_up_and_create('test@test.com', 'testpassword', 'KFC')
       visit '/restaurants'
       click_link 'Delete KFC'
       expect(page).not_to have_content 'KFC'
       expect(page).to have_content 'Restaurant deleted successfully'
+    end
+
+    context 'cannot delete restaurant they have not created' do
+      before do
+        sign_up_and_create('before@test.com', 'testtest', 'KFC')
+        click_link 'Sign out'
+      end
+
+      scenario 'by clicking a link' do
+        sign_up('test@test.com', 'testpassword')
+        expect(page).not_to have_content 'Delete KFC'
+      end
+
+      scenario 'by visiting url directly' do
+        sign_up('test@test.com', 'testpassword')
+        restaurant = Restaurant.find_by_name('KFC')
+        page.driver.submit :delete, "/restaurants/#{restaurant.id}", {}
+        expect(page).to have_content 'You need to sign in or sign up before continuing.'
+      end
     end
   end
 end
