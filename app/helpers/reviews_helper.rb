@@ -1,9 +1,9 @@
 module ReviewsHelper
 
   def star_rating rating
-    return rating unless rating.is_a?(Fixnum)
-    remainder = 5 - rating
-    '★' * rating + '☆' * remainder
+    return rating unless rating.respond_to?(:round)
+    remainder = 5 - rating.round
+    '★' * rating.round + '☆' * remainder
   end
 
 end
