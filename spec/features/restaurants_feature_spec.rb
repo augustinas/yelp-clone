@@ -1,11 +1,19 @@
 require 'rails_helper'
 
 def sign_up(email, password)
-    visit '/users/sign_up'
-    fill_in 'Email', with: email
-    fill_in 'Password', with: password
-    fill_in 'Password confirmation', with: password
-    click_button 'LET ME YALP!'
+  visit '/users/sign_up'
+  fill_in 'Email', with: email
+  fill_in 'Password', with: password
+  fill_in 'Password confirmation', with: password
+  click_button 'LET ME YALP!'
+end
+
+def sign_up_and_create(email, password, restaurant)
+  sign_up(email, password)
+  visit '/restaurants'
+  click_link 'Add a restaurant'
+  fill_in 'Name', with: 'KFC'
+  click_button 'Create Restaurant'
 end
 
 feature 'restaurants' do
@@ -81,16 +89,32 @@ feature 'restaurants' do
   end
 
   context 'editing restaurants' do
-    before { Restaurant.create name: 'KFC' }
-
     scenario 'let a user edit a Restaurant' do
-      sign_up('test@test.com', 'testpassword')
+      sign_up_and_create('test@test.com', 'testpassword', 'KFC')
       visit '/restaurants'
       click_link 'Edit KFC'
       fill_in 'Name', with: 'Kentucky Fried Chicken'
       click_button 'Update Restaurant'
       expect(page).to have_content 'Kentucky Fried Chicken'
       expect(current_path).to eq '/restaurants'
+    end
+
+    context 'cannot edit restaurant they have not created' do
+      before do
+        sign_up_and_create('phantom@test.com', 'testtest', 'KFC')
+        click_link 'Sign out'
+      end
+
+      scenario 'by clicking a link' do
+        sign_up('test@test.com', 'testpassword')
+        expect(page).not_to have_content 'Edit KFC'
+      end
+
+      scenario 'by visiting url directly' do
+        sign_up('test@test.com', 'testpassword')
+        visit '/restaurants/1/edit'
+        expect(page).to have_content 'You need to sign in or sign up before continuing.'
+      end
     end
   end
 
