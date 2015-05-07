@@ -101,7 +101,7 @@ feature 'restaurants' do
 
     context 'cannot edit restaurant they have not created' do
       before do
-        sign_up_and_create('phantom@test.com', 'testtest', 'KFC')
+        sign_up_and_create('before@test.com', 'testtest', 'KFC')
         click_link 'Sign out'
       end
 
@@ -112,7 +112,8 @@ feature 'restaurants' do
 
       scenario 'by visiting url directly' do
         sign_up('test@test.com', 'testpassword')
-        visit '/restaurants/1/edit'
+        restaurant = Restaurant.find_by_name('KFC')
+        visit "/restaurants/#{restaurant.id}/edit"
         expect(page).to have_content 'You need to sign in or sign up before continuing.'
       end
     end
