@@ -1,8 +1,17 @@
 require 'rails_helper'
 
+def sign_up(email, password)
+    visit '/users/sign_up'
+    fill_in 'Email', with: email
+    fill_in 'Password', with: password
+    fill_in 'Password confirmation', with: password
+    click_button 'LET ME YALP!'
+end
+
 feature 'restaurants' do
   context 'no restaurants have been added' do
-    scenario 'should display a prompt to add a restaurant' do
+    scenario 'should display a prompt to add a restaurant'  do
+      sign_up('test@test.com', 'testpassword')
       visit '/restaurants'
       expect(page).to have_content 'No restaurants yet'
       expect(page).to have_link 'Add a restaurant'
@@ -22,24 +31,41 @@ feature 'restaurants' do
   end
 
   context 'creating restaurants' do
-    scenario 'prompts user to fill out a form then displays the new restaurant' do
-      visit '/restaurants'
-      click_link 'Add a restaurant'
-      fill_in 'Name', with: 'KFC'
-      click_button 'Create Restaurant'
-      expect(page).to have_content 'KFC'
-      expect(current_path).to eq '/restaurants'
-    end
 
-    context 'an invalid restaurant' do
-      it 'does not let you submit a name that is too short' do
+    context 'logged in user' do
+      scenario 'prompts user to fill out a form then displays the new restaurant' do
+        sign_up('test@test.com', 'testpassword')
         visit '/restaurants'
         click_link 'Add a restaurant'
-        fill_in 'Name', with: 'kf'
+        fill_in 'Name', with: 'KFC'
         click_button 'Create Restaurant'
-        expect(page).not_to have_css 'h2', text: 'kf'
-        expect(page).to have_content 'Error'
-       end
+        expect(page).to have_content 'KFC'
+        expect(current_path).to eq '/restaurants'
+      end
+
+      context 'an invalid restaurant' do
+        it 'does not let you submit a name that is too short' do
+          sign_up('test@test.com', 'testpassword')
+          visit '/restaurants'
+          click_link 'Add a restaurant'
+          fill_in 'Name', with: 'kf'
+          click_button 'Create Restaurant'
+          expect(page).not_to have_css 'h2', text: 'kf'
+          expect(page).to have_content 'Error'
+         end
+      end
+    end
+
+    context 'a logged out user' do
+      scenario 'does not see add restaurant button' do
+        visit '/restaurants'
+        expect(page).not_to have_link 'Add a restaurant'
+      end
+
+      scenario 'cannot visit add restaurants form' do
+        visit '/restaurants/new'
+        expect(page).to have_content 'You need to sign in or sign up before continuing.'
+      end
     end
   end
 
@@ -58,6 +84,7 @@ feature 'restaurants' do
     before { Restaurant.create name: 'KFC' }
 
     scenario 'let a user edit a Restaurant' do
+      sign_up('test@test.com', 'testpassword')
       visit '/restaurants'
       click_link 'Edit KFC'
       fill_in 'Name', with: 'Kentucky Fried Chicken'
@@ -71,6 +98,7 @@ feature 'restaurants' do
     before { Restaurant.create name: 'KFC' }
 
     scenario 'let a user delete a restaurant' do
+      sign_up('test@test.com', 'testpassword')
       visit '/restaurants'
       click_link 'Delete KFC'
       expect(page).not_to have_content 'KFC'
