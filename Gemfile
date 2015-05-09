@@ -43,9 +43,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'capistrano-rails', group: :development
 
 group :development, :test do
-  gem 'poltergeist'
+  #gem 'poltergeist'
 
-  gem 'database_cleaner'
+  #gem 'database_cleaner'
 
   gem 'rspec-collection_matchers'
 

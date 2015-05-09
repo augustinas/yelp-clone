@@ -17,9 +17,10 @@
       %ul
         - restaurant.reviews.each do |review|
           %li
-            = review.thoughts
-            %p= pluralize review.endorsements.count, 'endorsement'
-            %strong= "#{review.rating}/5"
+            #{review.thoughts} Rating: #{star_rating(review.rating)}
+            = link_to 'Endorse', review_endorsements_path(review), class: 'endorsements-link'
+            %span.endorsements_count= review.endorsements.count
+            = 'endorsement'.pluralize review.endorsements.count
     - else
       %p No reviews
 - else
