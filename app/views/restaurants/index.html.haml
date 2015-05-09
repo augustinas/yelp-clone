@@ -18,6 +18,7 @@
         - restaurant.reviews.each do |review|
           %li
             = review.thoughts
+            %p= pluralize review.endorsements.count, 'endorsement'
             %strong= "#{review.rating}/5"
     - else
       %p No reviews
